@@ -72,8 +72,8 @@ button {
 }
 
 button:hover {
-  background-color: #0056b3;
-  transform: scale(1.02);
+  background-color: #004cff;
+  transform: scale(1.05);
 }
 
 button:disabled {
@@ -83,7 +83,7 @@ button:disabled {
 
 a {
   color: #007bff;
-  font-size: 14px;
+  font-size: 12px;
   text-decoration: none;
 }
 

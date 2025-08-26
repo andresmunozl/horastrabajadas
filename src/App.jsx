@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import './App.css';
+import { ToastContainer, toast } from 'react-toastify';
 
 function App() {
+
   const [formData, setFormData] = useState({
     concepts: '',
     attendanceIn: '',
@@ -36,58 +38,72 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!isFormValid()) return;
+
+    const parsedConcepts = parseConcepts(formData.concepts);
+    if (!parsedConcepts) return;
+
+    const payload = buildPayload(parsedConcepts);
+
+    await submitForm(payload);
+  };
+
+  const isFormValid = () => {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      return;
+      return false;
     }
+    return true;
+  };
 
-    const cleanedConceptsString = formData.concepts
-      .replace(/[\t\r\n]+/g, '') // quita \t, \n y \r
-      .trim();
+  const parseConcepts = (conceptsString) => {
+    const cleanedString = conceptsString.replace(/[\t\r\n]+/g, '').trim();
 
-    let parsedConcepts;
     try {
-      parsedConcepts = JSON.parse(cleanedConceptsString);
-      if (!Array.isArray(parsedConcepts)) {
+      const parsed = JSON.parse(cleanedString);
+      if (!Array.isArray(parsed)) {
         throw new Error('El campo "concepts" debe ser un array de objetos');
       }
+      return parsed;
     } catch (error) {
-      setErrors({
-        ...validationErrors,
+      setErrors((prev) => ({
+        ...prev,
         concepts: 'El campo "Configuración de conceptos" debe ser un JSON válido (ej. [{...}, {...}])'
-      });
-      return;
+      }));
+      return null;
     }
+  };
 
+  const buildPayload = (parsedConcepts) => ({
+    concepts: parsedConcepts,
+    attendanceIn: formData.attendanceIn,
+    attendanceOut: formData.attendanceOut
+  });
+
+  const submitForm = async (payload) => {
     setErrors({});
     setLoading(true);
-    const payload = {
-      concepts: parsedConcepts,
-      attendanceIn: formData.attendanceIn,
-      attendanceOut: formData.attendanceOut
-    };
 
     try {
       const response = await fetch('https://falconcloud.co/site_srv10_ph/site/api/qserv.php/13465-770721', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
-      if (!response.ok) {
-        throw new Error(`Error en la petición: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Error en la petición: ${response.status}`);
 
       const data = await response.json();
       console.log('Respuesta del servidor:', data);
-       if (Object.keys(data).length === 0) {
-        alert('El servidor no devolvió resultados. Verifica la información enviada e intenta nuevamente.');
+
+      if (Object.keys(data).length === 0) {
+        toast('El servidor no devolvió resultados. Verifica la información enviada.');
       } else {
-        alert('Formulario enviado con éxito');
+        toast('Formulario enviado con éxito');
       }
+
     } catch (error) {
       console.error('Error:', error);
       alert('Hubo un error al enviar los datos');
@@ -96,12 +112,13 @@ function App() {
     }
   };
 
+
   return (
     <div style={{ padding: '20px' }}>
       <h1>Calcular Horas Trabajadas</h1>
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxWidth: '400px' }}>
-        
+
         <div>
           <label>Configuración de conceptos (JSON):</label>
           <textarea
@@ -151,8 +168,10 @@ function App() {
         </button>
       </form>
 
-      
-      
+      <div>
+        <ToastContainer autoClose={3000} />
+      </div>
+
     </div>
   );
 }
