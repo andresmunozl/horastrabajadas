@@ -96,3 +96,17 @@ a:hover {
   font-size: 13px;
   margin-top: 4px;
 }
+
+.responsive-container {
+  display: flex;
+  gap: 5em;
+  align-items: flex-start;
+  flex-direction: row;
+}
+
+@media screen and (max-width: 900px) {
+  .responsive-container {
+    flex-direction: column;
+  }
+}
+
