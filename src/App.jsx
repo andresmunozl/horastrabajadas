@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import './App.css';
+import { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
+import Welcome from './components/welcome';
+import './App.css';
+
 
 function App() {
 
@@ -12,6 +14,11 @@ function App() {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
+
+  const handleWelcomeFinish = () => {
+    setShowWelcome(false);
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -99,9 +106,9 @@ function App() {
       console.log('Respuesta del servidor:', data);
 
       if (Object.keys(data).length === 0) {
-        toast('El servidor no devolvió resultados. Verifica la información enviada.');
+        toast.warn('El servidor no devolvió resultados. Verifica la información enviada.');
       } else {
-        toast('Formulario enviado con éxito');
+        toast.success('Formulario enviado con éxito');
       }
 
     } catch (error) {
@@ -115,63 +122,68 @@ function App() {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h1>Calcular Horas Trabajadas</h1>
+      {showWelcome ? (
+        <Welcome onFinish={handleWelcomeFinish} />
+      ) : (
+        <>
+          <h1>Calcular Horas Trabajadas</h1>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxWidth: '400px' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxWidth: '400px' }}>
 
-        <div>
-          <label>Configuración de conceptos (JSON):</label>
-          <textarea
-            name="concepts"
-            value={formData.concepts}
-            onChange={handleChange}
-            rows="6"
-            placeholder='Ejemplo: [{"id":"HO","name":"HO","start":"08:00","end":"17:59"}]'
-            style={{ width: '100%', padding: '8px' }}
-          />
-          {errors.concepts && <p style={{ color: 'red', fontSize: '14px' }}>{errors.concepts}</p>}
-          <p>
-            <a href="#" onClick={(e) => { e.preventDefault(); handleLoadTemplate(); }}>
-              Usar plantilla por defecto
-            </a>
-          </p>
-        </div>
+            <div>
+              <label>Configuración de conceptos (JSON):</label>
+              <textarea
+                name="concepts"
+                value={formData.concepts}
+                onChange={handleChange}
+                rows="6"
+                placeholder='Ejemplo: [{"id":"HO","name":"HO","start":"08:00","end":"17:59"}]'
+                style={{ width: '100%', padding: '8px' }}
+              />
+              {errors.concepts && <p style={{ color: 'red', fontSize: '14px' }}>{errors.concepts}</p>}
+              <p>
+                <a href="#" onClick={(e) => { e.preventDefault(); handleLoadTemplate(); }}>
+                  Usar plantilla por defecto
+                </a>
+              </p>
+            </div>
 
-        <div>
-          <label>Hora de entrada:</label>
-          <input
-            type="time"
-            name="attendanceIn"
-            value={formData.attendanceIn}
-            onChange={handleChange}
-          />
-          {errors.attendanceIn && <p style={{ color: 'red', fontSize: '14px' }}>{errors.attendanceIn}</p>}
-        </div>
+            <div>
+              <label>Hora de entrada:</label>
+              <input
+                type="time"
+                name="attendanceIn"
+                value={formData.attendanceIn}
+                onChange={handleChange}
+              />
+              {errors.attendanceIn && <p style={{ color: 'red', fontSize: '14px' }}>{errors.attendanceIn}</p>}
+            </div>
 
-        <div>
-          <label>Hora de salida:</label>
-          <input
-            type="time"
-            name="attendanceOut"
-            value={formData.attendanceOut}
-            onChange={handleChange}
-          />
-          {errors.attendanceOut && <p style={{ color: 'red', fontSize: '14px' }}>{errors.attendanceOut}</p>}
-        </div>
+            <div>
+              <label>Hora de salida:</label>
+              <input
+                type="time"
+                name="attendanceOut"
+                value={formData.attendanceOut}
+                onChange={handleChange}
+              />
+              {errors.attendanceOut && <p style={{ color: 'red', fontSize: '14px' }}>{errors.attendanceOut}</p>}
+            </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          style={{ padding: '10px', backgroundColor: '#007bff', color: '#fff', border: 'none', cursor: 'pointer' }}
-        >
-          {loading ? 'Enviando...' : 'Enviar'}
-        </button>
-      </form>
+            <button
+              type="submit"
+              disabled={loading}
+              style={{ padding: '10px', backgroundColor: '#007bff', color: '#fff', border: 'none', cursor: 'pointer' }}
+            >
+              {loading ? 'Enviando...' : 'Enviar'}
+            </button>
+          </form>
 
-      <div>
-        <ToastContainer autoClose={3000} />
-      </div>
-
+          <div>
+            <ToastContainer />
+          </div>
+        </>
+      )}
     </div>
   );
 }
