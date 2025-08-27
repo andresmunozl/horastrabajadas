@@ -24,7 +24,7 @@ function ConceptsList({ concepts, setConcepts }) {
     if (concepts.length === 0) {
         return null;
     }
-    
+
     const offset = currentPage * itemsPerPage;
     const currentItems = concepts.slice(offset, offset + itemsPerPage);
     const pageCount = Math.ceil(concepts.length / itemsPerPage);
@@ -40,18 +40,9 @@ function ConceptsList({ concepts, setConcepts }) {
                 {currentItems.map((concept, index) => (
                     <div key={offset + index} className="concept-card">
                         <form className="form">
-                            <div className="concept-grid">
-                                <div className="form-group">
-                                    <label>Identificador:</label>
-                                    <input
-                                        type="text"
-                                        value={concept.id}
-                                        onChange={(e) => handleEditConcept(offset + index, 'id', e.target.value)}
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Nombre:</label>
+                            <div className="concept-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5em' }}>
+                                <div className="form-group" style={{ gridColumn: '1 / 3' }}>
+                                    <label>Nombre del concepto:</label>
                                     <input
                                         type="text"
                                         value={concept.name}
@@ -78,16 +69,21 @@ function ConceptsList({ concepts, setConcepts }) {
                                 </div>
                             </div>
 
-                            <a
-                                href="#"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    handleRemoveConcept(offset + index);
-                                }}
-                                className="text-red"
-                            >
-                                Eliminar concepto
-                            </a>
+                            <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <small style={{ color: '#666', fontSize: '12px' }}>
+                                    ID: {concept.id}
+                                </small>
+                                <a
+                                    href="#"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleRemoveConcept(offset + index);
+                                    }}
+                                    className="text-red"
+                                >
+                                    Eliminar concepto
+                                </a>
+                            </div>
 
                         </form>
                     </div>

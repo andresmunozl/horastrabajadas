@@ -1,8 +1,6 @@
 import Chart from 'react-apexcharts';
 
 function Results({ rawData }) {
-    const labels = Object.keys(rawData);
-    const values = Object.values(rawData);
     const order = ['HO', 'HED', 'HEN'];
 
     const labelMap = {
@@ -17,7 +15,7 @@ function Results({ rawData }) {
         HEN: '#521aebff'
     };
 
-    const defaultColor = '#888888';
+    const defaultColor = '#1740f8ff';
 
     const sortedLabels = [
         ...order.filter(l => l in rawData),

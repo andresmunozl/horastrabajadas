@@ -15,7 +15,6 @@ function App() {
 
   const [concepts, setConcepts] = useState([]);
   const [newConcept, setNewConcept] = useState({
-    id: '',
     name: '',
     start: '',
     end: ''
@@ -25,6 +24,18 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
   const [rawData, setRawData] = useState({});
+
+  const generateUniqueId = () => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    do {
+      result = '';
+      for (let i = 0; i < 6; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+    } while (concepts.some(concept => concept.id === result));
+    return result;
+  };
 
   const handleWelcomeFinish = () => {
     setShowWelcome(false);
@@ -47,19 +58,18 @@ function App() {
   const handleAddConcept = (e) => {
     e.preventDefault();
 
-    if (!newConcept.id.trim() || !newConcept.name.trim() || !newConcept.start || !newConcept.end) {
+    if (!newConcept.name.trim() || !newConcept.start || !newConcept.end) {
       toast.error('Todos los campos del concepto son requeridos');
       return;
     }
 
-    if (concepts.some(concept => concept.id === newConcept.id)) {
-      toast.error('Ya existe un concepto con ese ID');
-      return;
-    }
-
-    setConcepts([...concepts, { ...newConcept }]);
+    const uniqueId = generateUniqueId();
+    
+    setConcepts([...concepts, { 
+      id: uniqueId,
+      ...newConcept 
+    }]);
     setNewConcept({
-      id: '',
       name: '',
       start: '',
       end: ''
@@ -180,19 +190,8 @@ function App() {
                 <h4>Agregar Nuevo Concepto</h4>
                 <form onSubmit={handleAddConcept} className="form">
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5em' }}>
-                    <div className="form-group">
-                      <label>Identificador:</label>
-                      <input
-                        type="text"
-                        name="id"
-                        value={newConcept.id}
-                        onChange={handleNewConceptChange}
-                        placeholder="ej: HO"
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label>Nombre:</label>
+                    <div className="form-group" style={{ gridColumn: '1 / 3' }}>
+                      <label>Nombre del concepto:</label>
                       <input
                         type="text"
                         name="name"
@@ -278,10 +277,6 @@ function App() {
                   </button>
                 </form>
               </div>
-              {/* <div className="container" style={{ maxWidth: '500px' }}>
-                <ConceptsList concepts={concepts} setConcepts={setConcepts} />
-              </div> */}
-
 
               {errors.concepts && <p className="error" style={{ textAlign: 'center', margin: '10px 0' }}>{errors.concepts}</p>}
             </div>
