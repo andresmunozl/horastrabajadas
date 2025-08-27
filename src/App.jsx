@@ -137,7 +137,6 @@ function App() {
       if (!response.ok) throw new Error(`Error en la petición: ${response.status}`);
 
       const data = await response.json();
-      console.log('Respuesta del servidor:', data);
 
       if (Object.keys(data).length === 0) {
         toast.warn('El servidor no devolvió resultados. Verifica la información enviada.');
