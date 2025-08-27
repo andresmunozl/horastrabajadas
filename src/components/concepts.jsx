@@ -24,8 +24,7 @@ function ConceptsList({ concepts, setConcepts }) {
     if (concepts.length === 0) {
         return null;
     }
-
-    // Calcular los elementos a mostrar en la página actual
+    
     const offset = currentPage * itemsPerPage;
     const currentItems = concepts.slice(offset, offset + itemsPerPage);
     const pageCount = Math.ceil(concepts.length / itemsPerPage);
