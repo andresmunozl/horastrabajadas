@@ -48,7 +48,7 @@ function App() {
     e.preventDefault();
 
     if (!newConcept.id.trim() || !newConcept.name.trim() || !newConcept.start || !newConcept.end) {
-      toast.error('Todos los campos del concepto son obligatorios');
+      toast.error('Todos los campos del concepto son requeridos');
       return;
     }
 
@@ -71,8 +71,8 @@ function App() {
   const validate = () => {
     const newErrors = {};
     if (concepts.length === 0) newErrors.concepts = 'Debe agregar al menos un concepto';
-    if (!formData.attendanceIn) newErrors.attendanceIn = 'La hora de entrada es obligatoria';
-    if (!formData.attendanceOut) newErrors.attendanceOut = 'La hora de salida es obligatoria';
+    if (!formData.attendanceIn) newErrors.attendanceIn = 'La hora de entrada es requerida';
+    if (!formData.attendanceOut) newErrors.attendanceOut = 'La hora de salida es requerida';
     return newErrors;
   };
 
@@ -152,32 +152,36 @@ function App() {
         <>
           <div
             style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
               width: '100%',
-              height: '150px',
+              height: '100px',
               background: 'linear-gradient(90deg, #007bff, #66b2ff)',
               color: '#fff',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              marginBottom: '10px',
-              borderRadius: '5px',
-              boxShadow: '0 5px 5px rgba(0,0,0,0.1)',
-              padding: '10px',
+              textAlign: 'center',
+              zIndex: 1000,
+              boxShadow: '0 5px 10px rgba(0,0,0,0.2)'
+
             }}
           >
             <h2>¡Bienvenido! Calcula tus horas trabajadas</h2>
           </div>
 
-          <div className="responsive-container">
+
+          <div className="responsive-container" style={{ marginTop: '50px', marginBottom: '30px' }}>
             <div>
-              <h4>Configura tus conceptos y horas</h4>
+              <h4>Configura tus conceptos y horas trabajadas</h4>
 
               <div className="container" style={{ maxWidth: '500px' }}>
                 <h4>Agregar Nuevo Concepto</h4>
                 <form onSubmit={handleAddConcept} className="form">
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5em' }}>
                     <div className="form-group">
-                      <label>ID del concepto:</label>
+                      <label>Identificador:</label>
                       <input
                         type="text"
                         name="id"
@@ -242,6 +246,7 @@ function App() {
                     Usar una plantilla por defecto
                   </a>
                 </p>
+                <ConceptsList concepts={concepts} setConcepts={setConcepts} />
                 <h4>Información de Asistencia</h4>
                 <form onSubmit={handleSubmit} className="form">
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5em' }}>
@@ -273,9 +278,9 @@ function App() {
                   </button>
                 </form>
               </div>
-              <div className="container" style={{ maxWidth: '500px' }}>
+              {/* <div className="container" style={{ maxWidth: '500px' }}>
                 <ConceptsList concepts={concepts} setConcepts={setConcepts} />
-              </div>
+              </div> */}
 
 
               {errors.concepts && <p className="error" style={{ textAlign: 'center', margin: '10px 0' }}>{errors.concepts}</p>}

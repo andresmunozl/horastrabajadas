@@ -43,6 +43,17 @@ function Results({ rawData }) {
 
     const chartSeries = [{ name: 'Horas', data: sortedValues }];
 
+    const donutOptions = {
+        chart: { type: 'donut' },
+        labels: descriptiveLabels,
+        colors: barColors,
+        legend: { position: 'bottom' },
+        dataLabels: { enabled: true, formatter: (val) => `${val.toFixed(1)}%` },
+        title: { text: 'Distribución porcentual' },
+    };
+
+    const donutSeries = sortedValues;
+
     return (
         <div style={{ marginTop: '30px' }}>
             <h4>Resumen de Horas trabajadas</h4>
@@ -70,6 +81,10 @@ function Results({ rawData }) {
 
             <div style={{ maxWidth: '600px', marginBottom: '20px' }}>
                 <Chart options={chartOptions} series={chartSeries} type="bar" height={300} />
+            </div>
+
+            <div style={{ maxWidth: '500px', margin: '0 auto' }}>
+                <Chart options={donutOptions} series={donutSeries} type="donut" height={300} />
             </div>
         </div>
     );

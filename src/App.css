@@ -118,22 +118,15 @@ a:hover {
   margin-bottom: 15px;
 }
 
-.btn-danger {
-  background-color: #dc3545;
-  color: #fff;
-  border: none;
-  padding: 12px;
-  border-radius: 5px;
-  font-size: 14px;
-  font-weight: 600;
+.text-red {
+  color: red;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s;
+  text-decoration: underline;
+}
+.text-red:hover {
+  color: red;
 }
 
-.btn-danger:hover {
-  background-color: #e4606d;
-  transform: scale(1.02);
-}
 
 /* paginacion */
 .pagination {
