@@ -5,6 +5,7 @@
   text-align: center;
 }
 
+/* generales */
 body {
   font-family: 'Segoe UI', Tahoma, sans-serif;
   background: #ffffff;
@@ -14,46 +15,37 @@ body {
 }
 
 .container {
-  max-width: 500px;
-  margin: 60px auto;
+  max-width: 600px;
   background: #fff;
-  padding: 30px;
+  padding: 60px;
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 1.8rem;
-  color: #575757;
+  margin-bottom: 1em;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
 }
 
 .form-group label {
-  font-weight: 600;
-  margin-bottom: 6px;
+  font-weight: 100;
+  margin-bottom: 3px;
   display: block;
   color: #575757;
 }
 
-textarea, input[type="time"] {
-  width: 100%;
-  padding: 12px;
-  font-size: 14px;
-  border-radius: 8px;
+input[type="time"], input[type="text"]{
+  width: 80%;
+  padding: 10px;
+  font-size: 12px;
+  border-radius: 5px;
   border: 1px solid #ccc;
-  background: #fdfdfd;
   transition: all 0.3s ease;
   color-scheme: light;
 }
 
-textarea:focus, input[type="time"]:focus {
+input[type="time"]:focus, input[type="text"]:focus {
   border-color: #007bff;
   outline: none;
   box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
@@ -64,7 +56,7 @@ button {
   color: #fff;
   padding: 14px;
   border: none;
-  border-radius: 8px;
+  border-radius: 5px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -72,7 +64,7 @@ button {
 }
 
 button:hover {
-  background-color: #004cff;
+  background-color: #66b2ff;
   transform: scale(1.05);
 }
 
@@ -82,7 +74,6 @@ button:disabled {
 }
 
 a {
-  color: #007bff;
   font-size: 12px;
   text-decoration: none;
 }
@@ -110,3 +101,64 @@ a:hover {
   }
 }
 
+/* conceptos */
+.concept-card {
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  background: #fff;
+}
+
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+  margin-bottom: 15px;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s;
+}
+
+.btn-danger:hover {
+  background-color: #e4606d;
+  transform: scale(1.02);
+}
+
+/* paginacion */
+.pagination {
+  display: flex;
+  list-style: none;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 20px;
+  padding: 0;
+}
+
+.pagination li {
+  border: 1px solid #8c8c8c;
+  border-radius: 5px;
+  padding: 6px 12px;
+  cursor: pointer;
+  color: #8c8c8c;
+  font-size: 14px;
+}
+
+.pagination li:hover {
+  background-color: #f1f1f1;
+}
+
+.pagination .active {
+  background-color: #fff;
+  color: white;
+}

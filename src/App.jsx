@@ -2,15 +2,23 @@ import { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import Welcome from './components/welcome';
 import Results from './components/results';
+import ConceptsList from './components/concepts';
 import './App.css';
 
 
 function App() {
 
   const [formData, setFormData] = useState({
-    concepts: '',
     attendanceIn: '',
     attendanceOut: ''
+  });
+
+  const [concepts, setConcepts] = useState([]);
+  const [newConcept, setNewConcept] = useState({
+    id: '',
+    name: '',
+    start: '',
+    end: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -29,20 +37,55 @@ function App() {
     });
   };
 
+  const handleNewConceptChange = (e) => {
+    setNewConcept({
+      ...newConcept,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleAddConcept = (e) => {
+    e.preventDefault();
+
+    if (!newConcept.id.trim() || !newConcept.name.trim() || !newConcept.start || !newConcept.end) {
+      toast.error('Todos los campos del concepto son obligatorios');
+      return;
+    }
+
+    if (concepts.some(concept => concept.id === newConcept.id)) {
+      toast.error('Ya existe un concepto con ese ID');
+      return;
+    }
+
+    setConcepts([...concepts, { ...newConcept }]);
+    setNewConcept({
+      id: '',
+      name: '',
+      start: '',
+      end: ''
+    });
+
+    toast.success('Concepto agregado correctamente');
+  };
+
   const validate = () => {
     const newErrors = {};
-    if (!formData.concepts.trim()) newErrors.concepts = 'El concepto es obligatorio';
+    if (concepts.length === 0) newErrors.concepts = 'Debe agregar al menos un concepto';
     if (!formData.attendanceIn) newErrors.attendanceIn = 'La hora de entrada es obligatoria';
     if (!formData.attendanceOut) newErrors.attendanceOut = 'La hora de salida es obligatoria';
     return newErrors;
   };
 
-  const conceptsTemplate = `[{"id":"HO","name":"HO","start":"08:00","end":"17:59"},{"id":"HED","name":"HED","start":"18:00","end":"20:59"},{"id":"HEN","name":"HEN","start":"21:00","end":"05:59"}]`;
+  // Plantilla por defecto
+  const defaultConcepts = [
+    { "id": "HO", "name": "HO", "start": "08:00", "end": "17:59" },
+    { "id": "HED", "name": "HED", "start": "18:00", "end": "20:59" },
+    { "id": "HEN", "name": "HEN", "start": "21:00", "end": "05:59" }
+  ];
+
   const handleLoadTemplate = () => {
-    setFormData({
-      ...formData,
-      concepts: conceptsTemplate
-    });
+    setConcepts(defaultConcepts);
+    toast.success('Plantilla por defecto cargada');
   };
 
   const handleSubmit = async (e) => {
@@ -50,11 +93,7 @@ function App() {
 
     if (!isFormValid()) return;
 
-    const parsedConcepts = parseConcepts(formData.concepts);
-    if (!parsedConcepts) return;
-
-    const payload = buildPayload(parsedConcepts);
-
+    const payload = buildPayload();
     await submitForm(payload);
   };
 
@@ -64,29 +103,12 @@ function App() {
       setErrors(validationErrors);
       return false;
     }
+    setErrors({});
     return true;
   };
 
-  const parseConcepts = (conceptsString) => {
-    const cleanedString = conceptsString.replace(/[\t\r\n]+/g, '').trim();
-
-    try {
-      const parsed = JSON.parse(cleanedString);
-      if (!Array.isArray(parsed)) {
-        throw new Error('El campo "concepts" debe ser un array de objetos');
-      }
-      return parsed;
-    } catch (error) {
-      setErrors((prev) => ({
-        ...prev,
-        concepts: 'El campo "Configuración de conceptos" debe ser un JSON válido (ej. [{...}, {...}])'
-      }));
-      return null;
-    }
-  };
-
-  const buildPayload = (parsedConcepts) => ({
-    concepts: parsedConcepts,
+  const buildPayload = () => ({
+    concepts: concepts,
     attendanceIn: formData.attendanceIn,
     attendanceOut: formData.attendanceOut
   });
@@ -116,12 +138,11 @@ function App() {
 
     } catch (error) {
       console.error('Error:', error);
-      alert('Hubo un error al enviar los datos');
+      toast.error('Hubo un error al enviar los datos');
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div style={{ padding: '20px' }}>
@@ -138,80 +159,134 @@ function App() {
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              marginBottom: '20px',
-              borderRadius: '8px',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              marginBottom: '10px',
+              borderRadius: '5px',
+              boxShadow: '0 5px 5px rgba(0,0,0,0.1)',
               padding: '10px',
             }}
           >
             <h2>¡Bienvenido! Calcula tus horas trabajadas</h2>
           </div>
 
-
-
-
           <div className="responsive-container">
-            <div style={{ flex: 1 }}>
+            <div>
               <h4>Configura tus conceptos y horas</h4>
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxWidth: '400px' }}>
 
-                <div>
-                  <label>Configuración de conceptos (JSON):</label>
-                  <textarea
-                    name="concepts"
-                    value={formData.concepts}
-                    onChange={handleChange}
-                    rows="6"
-                    placeholder='Ejemplo: [{"id":"HO","name":"HO","start":"08:00","end":"17:59"}]'
-                    style={{ width: '100%', padding: '8px' }}
-                  />
-                  {errors.concepts && <p style={{ color: 'red', fontSize: '14px' }}>{errors.concepts}</p>}
-                  <p>
-                    <a href="#" onClick={(e) => { e.preventDefault(); handleLoadTemplate(); }}>
-                      Usar plantilla por defecto
-                    </a>
-                  </p>
-                </div>
+              <div className="container" style={{ maxWidth: '500px' }}>
+                <h4>Agregar Nuevo Concepto</h4>
+                <form onSubmit={handleAddConcept} className="form">
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5em' }}>
+                    <div className="form-group">
+                      <label>ID del concepto:</label>
+                      <input
+                        type="text"
+                        name="id"
+                        value={newConcept.id}
+                        onChange={handleNewConceptChange}
+                        placeholder="ej: HO"
+                      />
+                    </div>
 
-                <div>
-                  <label>Hora de entrada:</label>
-                  <input
-                    type="time"
-                    name="attendanceIn"
-                    value={formData.attendanceIn}
-                    onChange={handleChange}
-                  />
-                  {errors.attendanceIn && <p style={{ color: 'red', fontSize: '14px' }}>{errors.attendanceIn}</p>}
-                </div>
+                    <div className="form-group">
+                      <label>Nombre:</label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={newConcept.name}
+                        onChange={handleNewConceptChange}
+                        placeholder="ej: Horas Ordinarias"
+                      />
+                    </div>
 
-                <div>
-                  <label>Hora de salida:</label>
-                  <input
-                    type="time"
-                    name="attendanceOut"
-                    value={formData.attendanceOut}
-                    onChange={handleChange}
-                  />
-                  {errors.attendanceOut && <p style={{ color: 'red', fontSize: '14px' }}>{errors.attendanceOut}</p>}
-                </div>
+                    <div className="form-group">
+                      <label>Hora de inicio:</label>
+                      <input
+                        type="time"
+                        name="start"
+                        value={newConcept.start}
+                        onChange={handleNewConceptChange}
+                      />
+                    </div>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{ padding: '10px', backgroundColor: '#007bff', color: '#fff', border: 'none', cursor: 'pointer' }}
-                >
-                  {loading ? 'Enviando...' : 'Enviar'}
-                </button>
-              </form>
+                    <div className="form-group">
+                      <label>Hora de fin:</label>
+                      <input
+                        type="time"
+                        name="end"
+                        value={newConcept.end}
+                        onChange={handleNewConceptChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ textAlign: 'right', marginTop: '10px' }}>
+                    <button
+                      type="submit"
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        padding: '0',
+                        borderRadius: '50%',
+                        backgroundColor: '#28a745',
+                        fontSize: '20px'
+                      }}
+                      title="Agregar concepto"
+                    >
+                      +
+                    </button>
+                  </div>
+                </form>
+
+                <p style={{ marginTop: '15px', textAlign: 'center' }}>
+                  <a href="#" onClick={(e) => { e.preventDefault(); handleLoadTemplate(); }}>
+                    Usar una plantilla por defecto
+                  </a>
+                </p>
+                <h4>Información de Asistencia</h4>
+                <form onSubmit={handleSubmit} className="form">
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5em' }}>
+                    <div className="form-group">
+                      <label>Hora de entrada:</label>
+                      <input
+                        type="time"
+                        name="attendanceIn"
+                        value={formData.attendanceIn}
+                        onChange={handleChange}
+                      />
+                      {errors.attendanceIn && <p className="error">{errors.attendanceIn}</p>}
+                    </div>
+
+                    <div className="form-group">
+                      <label>Hora de salida:</label>
+                      <input
+                        type="time"
+                        name="attendanceOut"
+                        value={formData.attendanceOut}
+                        onChange={handleChange}
+                      />
+                      {errors.attendanceOut && <p className="error">{errors.attendanceOut}</p>}
+                    </div>
+                  </div>
+
+                  <button type="submit" disabled={loading} style={{ marginTop: '15px' }}>
+                    {loading ? 'Enviando...' : 'Enviar'}
+                  </button>
+                </form>
+              </div>
+              <div className="container" style={{ maxWidth: '500px' }}>
+                <ConceptsList concepts={concepts} setConcepts={setConcepts} />
+              </div>
+
+
+              {errors.concepts && <p className="error" style={{ textAlign: 'center', margin: '10px 0' }}>{errors.concepts}</p>}
             </div>
 
             <div>
-              {Object.keys(rawData).length > 0 &&
-                (
-                  <div style={{ flex: 2 }}>
-                    <Results rawData={rawData} />
-                  </div>
-                )}
+              {Object.keys(rawData).length > 0 && (
+                <div>
+                  <Results rawData={rawData} />
+                </div>
+              )}
             </div>
           </div>
 
